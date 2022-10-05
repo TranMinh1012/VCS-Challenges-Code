@@ -10,19 +10,12 @@ fi
 
 #Check log file exists or not
 if [[ -e $file_log ]]; then
-  echo "File $file_log was created"
+  echo "File $file_log was created in directory"
 else
   touch $file_log
 fi
 
 path_script="/usr/local/bin/sshloggerscript.sh"
-
-#Check script exists or not
-if [[ -e $path_script ]]; then
-  echo "Script $path_script was created"
-else
-  touch $path_script
-fi
 
 cat << EOF >$path_script
 #!/bin/bash
