@@ -1,14 +1,12 @@
 import socket
 import sys
+import re
 
 try:
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	print ("Socket successfully created")
 except socket.error:
 	print ("socket creation failed with error %s" %(socket.error))
-
-# Socket default port
-port = 80
 
 try:
 	host_ip = socket.gethostbyname('blogtest.vnprogramming.com')
@@ -19,22 +17,21 @@ except socket.gaierror:
 	sys.exit()
 
 # connecting to server
-s.connect((host_ip, port))
+s.connect((host_ip, 80))
 
-request = "GET / HTTP/1.1\r\nHost: ' + 'blogtest.vnprogramming.com' + '\r\n\r\n"
-s.sendall(request.encode())
+header = '''GET / HTTP/1.1
+Host: blogtest.vnprogramming.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+''' + '\r\n\r\n'
 
-response = s.recv(4096).decode()
-
-title = ''
-for line in response.split('\n'):
-    if "<title>" in line:
-        start = line.find('<title>')
-        end = line.find('</title>')
-        for i in range(start + 7, end):
-            title = title + line[i]
-        break
-
-print(f"Title: {title[0:10]}")
+s.send(header.encode())
+recv = ""
+while True:
+	recv += s.recv(4096).decode()
+	if "</html>" in recv:
+		break
+title = re.findall("<title>(.*?)</title>",recv)
+print(f"Title: {title[0][0:10]}")
 
 s.close()
